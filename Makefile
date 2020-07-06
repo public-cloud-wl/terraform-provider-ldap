@@ -1,6 +1,6 @@
 BINARY=terraform-provider-ldap
 TEST_ENV := LDAP_HOST=localhost LDAP_PORT=389 LDAP_BIND_USER="cn=admin,dc=example,dc=com" LDAP_BIND_PASSWORD=admin
-VERSION  := v1.0.1
+VERSION  := v1.0.2
 
 .DEFAULT_GOAL: $(BINARY)
 
