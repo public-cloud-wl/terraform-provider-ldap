@@ -12,9 +12,10 @@ bootstrap:
 
 cross-build:
 	rm -rf dist
-	gox -osarch "linux/amd64 darwin/amd64" \
+	CGO_ENABLED=0 GOFLAGS="-trimpath" gox -osarch "linux/amd64 darwin/amd64" \
 		-output "dist/{{.OS}}_{{.Arch}}/$(BINARY)_$(VERSION)" \
 		-ldflags "-w -s"
+	tar cvzf $(BINARY)_$(VERSION).tar.gz -C dist .
 
 test:
 	go test -v
