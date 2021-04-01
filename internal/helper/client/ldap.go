@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"crypto/tls"
@@ -7,20 +7,8 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// Config is the set of parameters needed to configure the LDAP provider.
-type Config struct {
-	LDAPHost     string
-	LDAPPort     int
-	BindUser     string
-	BindPassword string
-
-	StartTLS    bool
-	TLS         bool
-	TLSInsecure bool
-}
-
-func (c *Config) initiateAndBind() (*ldap.Conn, error) {
-	conn, err := c.dial()
+func DialAndBind(c *Config) (*ldap.Conn, error) {
+	conn, err := dial(c)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +24,7 @@ func (c *Config) initiateAndBind() (*ldap.Conn, error) {
 	return conn, nil
 }
 
-func (c *Config) dial() (*ldap.Conn, error) {
+func dial(c *Config) (*ldap.Conn, error) {
 	uri := fmt.Sprintf("%s:%d", c.LDAPHost, c.LDAPPort)
 
 	if c.TLS {

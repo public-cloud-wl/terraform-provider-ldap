@@ -1,4 +1,4 @@
-package main
+package set
 
 import (
 	"bytes"
@@ -11,8 +11,8 @@ type Set struct {
 	data map[string]struct{}
 }
 
-// NewSet creates a new string set.
-func NewSet(values ...string) *Set {
+// New creates a new string set.
+func New(values ...string) *Set {
 	set := &Set{
 		data: map[string]struct{}{},
 	}

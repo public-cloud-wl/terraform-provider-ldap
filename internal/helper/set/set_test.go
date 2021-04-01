@@ -1,4 +1,4 @@
-package main
+package set
 
 import "testing"
 
@@ -14,7 +14,7 @@ func setup() (*Set, *Set) {
 	s1.Add("e")
 	s1.Add("f")
 
-	s2 := NewSet()
+	s2 := New()
 	s2.Add("a")
 	s2.Add("b")
 	s2.Add("c")
