@@ -21,7 +21,7 @@ func TestAccLDAPObject_Basic(t *testing.T) {
 				Config: testAccCheckLDAPObjectConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckLDAPObjectExists("ldap_object.jdoe"),
-					resource.TestCheckResourceAttr("ldap_object.jdoe", "dn", "uid=jdoe,dv=example,dc=com"),
+					resource.TestCheckResourceAttr("ldap_object.jdoe", "dn", "uid=jdoe,dc=example,dc=com"),
 					//resource.TestCheckResourceAttr("ldap_object.jdoe", "base_dn", "dc=example,dc=com"),
 					resource.TestCheckResourceAttr("ldap_object.jdoe", "object_classes.0", "inetOrgPerson"),
 					resource.TestCheckResourceAttr("ldap_object.jdoe", "object_classes.1", "posixAccount"),
@@ -36,14 +36,17 @@ func testAccCheckLDAPObjectDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*ldap.Conn)
 	for _, r := range s.RootModule().Resources {
 		dn := r.Primary.Attributes["dn"]
-		sr, err := helperSearchRequest(dn, conn)
+		_, err := helperSearchRequest(dn, conn)
 		if err != nil {
+			if err, ok := err.(*ldap.Error); ok {
+				if err.ResultCode == 32 { // no such object
+					continue
+				}
+			}
 			return err
 		}
-		if len(sr.Entries) != 0 {
-			err = errors.New("Number of records greater than 0 for " + dn)
-			return err
-		}
+
+		return errors.New("Number of records greater than 0 for " + dn)
 	}
 	return nil
 }
