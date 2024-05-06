@@ -55,6 +55,7 @@ func Provider() *schema.Provider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"ldap_object": resourceLDAPObject(),
+			"ldap_group":  resourceLDAPGroup(),
 		},
 
 		ConfigureFunc: configureProvider,

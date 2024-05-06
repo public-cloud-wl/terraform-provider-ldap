@@ -42,13 +42,16 @@ resource "ldap_object" "a123456" {
 
 ### Required
 
-- **dn** (String) The Distinguished Name (DN) of the object, as the concatenation of its RDN (unique among siblings) and its parent's DN.
-- **object_classes** (Set of String) The set of classes this object conforms to (e.g. organizationalUnit, inetOrgPerson).
+- `dn` (String) The Distinguished Name (DN) of the object, as the concatenation of its RDN (unique among siblings) and its parent's DN.
+- `object_classes` (Set of String) The set of classes this object conforms to (e.g. organizationalUnit, inetOrgPerson).
 
 ### Optional
 
-- **attributes** (Set of Map of String) The map of attributes of this object; each attribute can be multi-valued.
-- **id** (String) The ID of this resource.
+- `attributes` (Set of Map of String) The map of attributes of this object; each attribute can be multi-valued.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 

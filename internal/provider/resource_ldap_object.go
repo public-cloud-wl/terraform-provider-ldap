@@ -268,6 +268,22 @@ func resourceLDAPObjectUpdate(d *schema.ResourceData, meta interface{}) error {
 				})
 			}
 		}
+
+	}
+
+	// Log the LDAP request modifications before sending the request
+	for _, change := range request.Changes {
+		operation := "" // will hold the LDAP operation as a string
+		switch change.Operation {
+		case ldap.AddAttribute:
+			operation = "Add"
+		case ldap.DeleteAttribute:
+			operation = "Delete"
+		case ldap.ReplaceAttribute:
+			operation = "Replace"
+		}
+		log.Printf("[DEBUG] ModifyRequest Change - Operation: %s, Type: %s, Values: %v",
+			operation, change.Modification.Type, change.Modification.Vals)
 	}
 
 	err := client.Modify(request)
