@@ -327,6 +327,10 @@ func resourceLDAPGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		request.Replace("description", []string{d.Get("description").(string)})
 	}
 
+	if d.HasChange("gid_number") {
+		request.Replace("gidNumber", []string{strconv.Itoa(d.Get("gid_number").(int))})
+	}
+
 	// Handle updates for member-like attributes
 	if err := updateLDAPAttributeSet(request, d, "member", "member"); err != nil {
 		return err
