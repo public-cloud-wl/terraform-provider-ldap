@@ -44,3 +44,4 @@ provider "ldap" {
 - `start_tls` (Boolean) Upgrade TLS to secure the connection (default: false).
 - `tls` (Boolean) Enable TLS encryption for LDAP (LDAPS) (default: false).
 - `tls_insecure` (Boolean) Don't verify server TLS certificate (default: false).
+- `invalid_attribute_values` (List{String}) List of attribute values that are considered invalid.

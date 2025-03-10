@@ -95,10 +95,16 @@ func resourceLDAPGroup() *schema.Resource {
 }
 
 func resourceLDAPGroupCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_group::create - creating a new group with DN %q", dn)
+
+	// Perform validation for attribute value.
+	if err := validateAttributes(d, providerConfig.InvalidAttributeValues); err != nil {
+		return err
+	}
 
 	request := ldap.NewAddRequest(dn, []ldap.Control{})
 
@@ -192,7 +198,8 @@ func resourceLDAPGroupCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceLDAPGroupRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_group::read - looking for group %q", dn)
@@ -315,10 +322,16 @@ func resourceLDAPGroupRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceLDAPGroupUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_group::update - updating group %q", dn)
+
+	// Perform validation for attribute value.
+	if err := validateAttributes(d, providerConfig.InvalidAttributeValues); err != nil {
+		return err
+	}
 
 	request := ldap.NewModifyRequest(dn, []ldap.Control{})
 
@@ -410,7 +423,8 @@ func resourceLDAPGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceLDAPGroupDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_group::delete - removing group %q", dn)
@@ -454,14 +468,6 @@ func deriveCNFromDN(dn string) (string, error) {
 	}
 
 	return "", fmt.Errorf("CN not found in DN")
-}
-
-func convertToStringSlice(input []interface{}) []string {
-	result := make([]string, len(input))
-	for i, v := range input {
-		result[i] = v.(string)
-	}
-	return result
 }
 
 func convertToInterfaceSlice(strings []string) []interface{} {

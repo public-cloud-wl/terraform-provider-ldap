@@ -115,7 +115,8 @@ func resourceLDAPObjectImport(d *schema.ResourceData, meta interface{}) (importe
 }
 
 func resourceLDAPObjectExists(d *schema.ResourceData, meta interface{}) (b bool, e error) {
-	conn := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	conn := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_object::exists - checking if %q exists", dn)
@@ -153,10 +154,16 @@ func resourceLDAPObjectExists(d *schema.ResourceData, meta interface{}) (b bool,
 }
 
 func resourceLDAPObjectCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_object::create - creating a new object under %q", dn)
+
+	// Perform validation for attribute value.
+	if err := validateAttributes(d, providerConfig.InvalidAttributeValues); err != nil {
+		return err
+	}
 
 	request := ldap.NewAddRequest(dn, []ldap.Control{})
 
@@ -210,9 +217,15 @@ func resourceLDAPObjectRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceLDAPObjectUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 
 	log.Printf("[DEBUG] ldap_object::update - performing update on %q", d.Id())
+
+	// Perform validation for attribute value.
+	if err := validateAttributes(d, providerConfig.InvalidAttributeValues); err != nil {
+		return err
+	}
 
 	request := ldap.NewModifyRequest(d.Id(), []ldap.Control{})
 
@@ -295,7 +308,8 @@ func resourceLDAPObjectUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceLDAPObjectDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_object::delete - removing %q", dn)
@@ -312,7 +326,8 @@ func resourceLDAPObjectDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func readLDAPObjectImpl(d *schema.ResourceData, meta interface{}, updateState bool) error {
-	client := meta.(*ldap.Conn)
+	providerConfig := meta.(*ProviderConfig)
+	client := providerConfig.Connection
 	dn := d.Get("dn").(string)
 
 	log.Printf("[DEBUG] ldap_object::read - looking for object %q", dn)
