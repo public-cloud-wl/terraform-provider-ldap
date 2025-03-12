@@ -1,9 +1,18 @@
 package provider
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/elastic-infra/terraform-provider-ldap/internal/helper/client"
+	"github.com/go-ldap/ldap/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
+type ProviderConfig struct {
+	Connection             *ldap.Conn
+	InvalidAttributeValues map[string]string
+}
 
 // Provider creates a new LDAP provider.
 func Provider() *schema.Provider {
@@ -51,6 +60,12 @@ func Provider() *schema.Provider {
 				DefaultFunc: schema.EnvDefaultFunc("LDAP_TLS_INSECURE", false),
 				Description: "Don't verify server TLS certificate (default: false).",
 			},
+			"invalid_attribute_values": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Map of attribute names with their invalid values.",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -78,5 +93,39 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 
-	return connection, nil
+	// Convert invalid attribute values to map[string]string.
+	invalidValues := make(map[string]string)
+	if v, ok := d.GetOk("invalid_attribute_values"); ok && v != nil {
+		for k, v := range v.(map[string]interface{}) {
+			invalidValues[k] = v.(string)
+		}
+	}
+
+	return &ProviderConfig{
+		Connection:             connection,
+		InvalidAttributeValues: invalidValues,
+	}, nil
+}
+
+func validateAttributes(d *schema.ResourceData, invalidValues map[string]string) error {
+	if v, ok := d.GetOk("attributes"); ok {
+		attributes := v.(*schema.Set).List()
+		for _, attribute := range attributes {
+			for name, value := range attribute.(map[string]interface{}) {
+				valStr := value.(string)
+				if invalidValue, exists := invalidValues[name]; exists && strings.EqualFold(valStr, invalidValue) {
+					return fmt.Errorf("attribute %q has invalid value '%s'", name, valStr)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func convertToStringSlice(input []interface{}) []string {
+	result := make([]string, len(input))
+	for i, v := range input {
+		result[i] = v.(string)
+	}
+	return result
 }
