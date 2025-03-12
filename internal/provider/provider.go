@@ -11,7 +11,7 @@ import (
 
 type ProviderConfig struct {
 	Connection             *ldap.Conn
-	InvalidAttributeValues []string
+	InvalidAttributeValues map[string]string
 }
 
 // Provider creates a new LDAP provider.
@@ -61,10 +61,10 @@ func Provider() *schema.Provider {
 				Description: "Don't verify server TLS certificate (default: false).",
 			},
 			"invalid_attribute_values": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "List of attribute values that are considered invalid.",
+				Description: "Map of attribute names with their invalid values.",
 			},
 		},
 
@@ -93,9 +93,12 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 
-	invalidValues := []string{}
+	// Convert invalid attribute values to map[string]string.
+	invalidValues := make(map[string]string)
 	if v, ok := d.GetOk("invalid_attribute_values"); ok && v != nil {
-		invalidValues = convertToStringSlice(v.([]interface{}))
+		for k, v := range v.(map[string]interface{}) {
+			invalidValues[k] = v.(string)
+		}
 	}
 
 	return &ProviderConfig{
@@ -104,16 +107,14 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	}, nil
 }
 
-func validateAttributes(d *schema.ResourceData, invalidValues []string) error {
+func validateAttributes(d *schema.ResourceData, invalidValues map[string]string) error {
 	if v, ok := d.GetOk("attributes"); ok {
 		attributes := v.(*schema.Set).List()
 		for _, attribute := range attributes {
 			for name, value := range attribute.(map[string]interface{}) {
 				valStr := value.(string)
-				for _, invalid := range invalidValues {
-					if strings.EqualFold(valStr, invalid) {
-						return fmt.Errorf("attribute %q has invalid value '%s'", name, valStr)
-					}
+				if invalidValue, exists := invalidValues[name]; exists && strings.EqualFold(valStr, invalidValue) {
+					return fmt.Errorf("attribute %q has invalid value '%s'", name, valStr)
 				}
 			}
 		}
