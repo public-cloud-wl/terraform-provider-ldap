@@ -32,15 +32,15 @@ func Provider() *schema.Provider {
 			},
 			"bind_user": {
 				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("LDAP_BIND_USER", nil),
-				Description: "Bind user to be used for authenticating on the LDAP server.",
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("LDAP_BIND_USER", ""),
+				Description: "Bind user to be used for authenticating on the LDAP server. Leave empty for anonymous bind.",
 			},
 			"bind_password": {
 				Type:        schema.TypeString,
-				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("LDAP_BIND_PASSWORD", nil),
-				Description: "Password to authenticate the Bind user.",
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("LDAP_BIND_PASSWORD", ""),
+				Description: "Password to authenticate the Bind user. Leave empty for anonymous bind.",
 			},
 			"start_tls": {
 				Type:        schema.TypeBool,
@@ -71,6 +71,10 @@ func Provider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"ldap_object": resourceLDAPObject(),
 			"ldap_group":  resourceLDAPGroup(),
+		},
+
+		DataSourcesMap: map[string]*schema.Resource{
+			"ldap_search": dataSourceLDAPSearch(),
 		},
 
 		ConfigureFunc: configureProvider,
