@@ -14,7 +14,12 @@ func DialAndBind(c *Config) (*ldap.Conn, error) {
 	}
 
 	// bind to current connection
-	err = conn.Bind(c.BindUser, c.BindPassword)
+	// Use UnauthenticatedBind for anonymous access when credentials are empty
+	if c.BindUser == "" && c.BindPassword == "" {
+		err = conn.UnauthenticatedBind("")
+	} else {
+		err = conn.Bind(c.BindUser, c.BindPassword)
+	}
 	if err != nil {
 		conn.Close()
 		return nil, err
