@@ -70,7 +70,10 @@ func dataSourceLDAPSearchMap() *schema.Resource {
 			},
 		},
 
-		Description: "Searches for LDAP objects and returns them as a map keyed by a chosen LDAP attribute.",
+		Description: "Searches for LDAP objects and returns them indexed by a chosen attribute value.\n\n" +
+			"Prefer this data source for keyed lookups (e.g. `dns[\"alice\"]`), large directories requiring pagination, " +
+			"or when multi-valued attributes must be preserved without information loss.\n\n" +
+			"Use `ldap_search` instead for simple ordered iteration or when the key attribute is not guaranteed to be unique.",
 	}
 }
 

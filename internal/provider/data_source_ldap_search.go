@@ -61,7 +61,10 @@ func dataSourceLDAPSearch() *schema.Resource {
 			},
 		},
 
-		Description: "Searches for LDAP objects matching a filter within a base DN.",
+		Description: "Searches for LDAP objects and returns an ordered list of entries.\n\n" +
+			"Prefer this data source for simple iteration or when no unique key attribute can be guaranteed. " +
+			"Note that multi-valued attributes are joined as comma-separated strings.\n\n" +
+			"Use `ldap_search_map` instead when you need keyed lookups, pagination, or lossless multi-valued attributes.",
 	}
 }
 

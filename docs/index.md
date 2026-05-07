@@ -34,14 +34,14 @@ provider "ldap" {
 
 ### Required
 
-- `bind_password` (String) Password to authenticate the Bind user.
-- `bind_user` (String) Bind user to be used for authenticating on the LDAP server.
 - `ldap_host` (String) The LDAP server to connect to.
 
 ### Optional
 
+- `bind_password` (String) Password to authenticate the Bind user. Leave empty for anonymous bind.
+- `bind_user` (String) Bind user to be used for authenticating on the LDAP server. Leave empty for anonymous bind.
+- `invalid_attribute_values` (Map of String) Map of attribute names with their invalid values.
 - `ldap_port` (Number) The LDAP protocol port (default: 389).
 - `start_tls` (Boolean) Upgrade TLS to secure the connection (default: false).
 - `tls` (Boolean) Enable TLS encryption for LDAP (LDAPS) (default: false).
 - `tls_insecure` (Boolean) Don't verify server TLS certificate (default: false).
-- `invalid_attribute_values` Map of attribute names with their invalid values.
