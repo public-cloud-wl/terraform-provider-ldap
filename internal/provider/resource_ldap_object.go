@@ -314,11 +314,7 @@ func resourceLDAPObjectDelete(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] ldap_object::delete - removing %q", dn)
 
-	request := ldap.NewDelRequest(dn, nil)
-
-	err := client.Del(request)
-	if err != nil {
-		log.Printf("[ERROR] ldap_object::delete - error removing %q: %v", dn, err)
+	if err := deleteLDAPEntry(client, dn, "ldap_object::delete"); err != nil {
 		return err
 	}
 	log.Printf("[DEBUG] ldap_object::delete - %q removed", dn)

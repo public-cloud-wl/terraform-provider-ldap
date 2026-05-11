@@ -429,10 +429,7 @@ func resourceLDAPGroupDelete(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] ldap_group::delete - removing group %q", dn)
 
-	request := ldap.NewDelRequest(dn, []ldap.Control{})
-
-	if err := client.Del(request); err != nil {
-		log.Printf("[ERROR] ldap_group::delete - error removing group %q: %v", dn, err)
+	if err := deleteLDAPEntry(client, dn, "ldap_group::delete"); err != nil {
 		return err
 	}
 
