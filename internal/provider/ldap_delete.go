@@ -2,6 +2,7 @@ package provider
 
 import (
 	"log"
+	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 )
@@ -28,6 +29,13 @@ func deleteLDAPEntry(conn *ldap.Conn, dn string, logPrefix string) error {
 		case ldap.LDAPResultReferral:
 			log.Printf("[WARN] %s - delete of %q returned referral, retrying with ManageDsaIT control", logPrefix, dn)
 			return deleteLDAPEntryWithManageDsaIT(conn, dn, logPrefix)
+		case ldap.LDAPResultUnwillingToPerform:
+			if isCannotDeleteReferralError(err) {
+				log.Printf("[WARN] %s - delete of %q returned unwillingToPerform/cannot delete referral, retrying with ManageDsaIT control", logPrefix, dn)
+				return deleteLDAPEntryWithManageDsaIT(conn, dn, logPrefix)
+			}
+			log.Printf("[ERROR] %s - error removing %q: %v", logPrefix, dn, err)
+			return err
 		default:
 			log.Printf("[ERROR] %s - error removing %q: %v", logPrefix, dn, err)
 			return err
@@ -35,6 +43,10 @@ func deleteLDAPEntry(conn *ldap.Conn, dn string, logPrefix string) error {
 	}
 
 	return nil
+}
+
+func isCannotDeleteReferralError(err error) bool {
+	return strings.Contains(strings.ToLower(err.Error()), "cannot delete referral")
 }
 
 func deleteLDAPEntryWithManageDsaIT(conn *ldap.Conn, dn string, logPrefix string) error {
