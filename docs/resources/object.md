@@ -57,6 +57,8 @@ resource "ldap_object" "a123456" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 $ export TF_LDAP_IMPORTER_PATH=a123456.tf
 $ terraform import ldap_object.a123456 uid=a123456,ou=users,dc=example,dc=com

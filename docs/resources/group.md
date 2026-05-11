@@ -3,12 +3,12 @@
 page_title: "ldap_group Resource - terraform-provider-ldap"
 subcategory: ""
 description: |-
-  Provides a LDAP Group.
+  
 ---
 
 # ldap_group (Resource)
 
-Provides a LDAP Group.
+
 
 ## Example Usage
 
@@ -42,14 +42,14 @@ resource "ldap_object" "groups_example_com" {
 }
 
 resource "ldap_group" "my_group" {
-  dn          = "cn=mygroup,${ldap_object.users_example_com.dn}"
+  dn             = "cn=mygroup,${ldap_object.users_example_com.dn}"
   object_classes = ["top", "posixGroup", "groupOfUniqueNames", "groupOfURLs"]
-  description = "My Group"
-  gid_number   = "1234567890"
-  attributes  = [{
+  description    = "My Group"
+  gid_number     = "1234567890"
+  attributes = [{
     businessCategory = "My Business Category"
   }]
-  unique_member = [ ldap_object.a123456.id ]
+  unique_member = [ldap_object.a123456.id]
 }
 ```
 
@@ -78,6 +78,8 @@ resource "ldap_group" "my_group" {
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 $ export TF_LDAP_IMPORTER_PATH=a123456.tf

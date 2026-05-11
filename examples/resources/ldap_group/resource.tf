@@ -27,12 +27,12 @@ resource "ldap_object" "groups_example_com" {
 }
 
 resource "ldap_group" "my_group" {
-  dn          = "cn=mygroup,${ldap_object.users_example_com.dn}"
+  dn             = "cn=mygroup,${ldap_object.users_example_com.dn}"
   object_classes = ["top", "posixGroup", "groupOfUniqueNames", "groupOfURLs"]
-  description = "My Group"
-  gid_number   = "1234567890"
-  attributes  = [{
+  description    = "My Group"
+  gid_number     = "1234567890"
+  attributes = [{
     businessCategory = "My Business Category"
   }]
-  unique_member = [ ldap_object.a123456.id ]
+  unique_member = [ldap_object.a123456.id]
 }

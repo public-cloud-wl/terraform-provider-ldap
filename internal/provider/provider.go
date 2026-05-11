@@ -74,7 +74,8 @@ func Provider() *schema.Provider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"ldap_search": dataSourceLDAPSearch(),
+			"ldap_search":     dataSourceLDAPSearch(),
+			"ldap_search_map": dataSourceLDAPSearchMap(),
 		},
 
 		ConfigureFunc: configureProvider,
