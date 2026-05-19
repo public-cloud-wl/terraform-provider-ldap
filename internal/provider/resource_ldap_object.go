@@ -201,8 +201,7 @@ func resourceLDAPObjectCreate(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	err := client.Add(request)
-	if err != nil {
+	if err := addLDAPEntry(client, request, dn, "ldap_object::create"); err != nil {
 		return err
 	}
 

@@ -186,8 +186,7 @@ func resourceLDAPGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	for _, attribute := range request.Attributes {
 		log.Printf("[DEBUG] Attribute being added to LDAP request: %s: %+v", attribute.Type, attribute.Vals)
 	}
-	if err := client.Add(request); err != nil {
-		log.Printf("[ERROR] Error while creating LDAP group with DN: %s. Error: %s", dn, err)
+	if err := addLDAPEntry(client, request, dn, "ldap_group::create"); err != nil {
 		return err
 	}
 
